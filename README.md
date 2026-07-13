@@ -1,128 +1,88 @@
-# Wazuh SIEM POC – Setup and Use Case Demonstration
-
+Wazuh SIEM POC – Setup and Use Case Demonstration
 A Proof of Concept (POC) deployment of the Wazuh Security Information and Event Management (SIEM) platform, demonstrating centralized security monitoring, agent-based log collection, and real-time detection of an SSH brute force attack.
-
 ---
-
-## Overview
-
+Overview
 This project documents the deployment and validation of a Wazuh SIEM POC environment. A Wazuh server was set up on a virtual machine, with Wazuh agents deployed on both a Kali Linux endpoint and a Windows endpoint. An SSH brute force attack was simulated from the Kali Linux system to validate Wazuh's detection, alerting, and visualization capabilities, demonstrating cross-platform monitoring and threat response.
-
-## Objectives
-
-- Deploy a functional Wazuh SIEM server (Manager, Indexer, and Dashboard) in a virtualized lab environment.
-- Deploy and register Wazuh agents on both a Linux (Kali) and a Windows endpoint.
-- Validate agent connectivity and communication with the central Wazuh server.
-- Simulate an SSH brute force attack to test real-time threat detection.
-- Analyze the resulting alerts, rules, and dashboard visualizations to confirm detection and incident investigation capabilities.
-
-## Technologies Used
-
-| Component | Version |
-|---|---|
-| Oracle VirtualBox | 7.0 |
-| Wazuh OVA | 4.7.3 |
-| Wazuh Manager | 4.14.1 |
-| Wazuh Indexer | 4.14.1 |
-| Wazuh Dashboard | 4.14.1 |
-| Wazuh Agent | 4.7.3 |
-| Endpoint OS | Kali Linux, Windows |
-
-## Architecture
-
-**Virtualization Platform:** Oracle VirtualBox 7.0
-
-| Machine | Specification |
-|---|---|
-| Host Machine | User host operating system |
-| Wazuh Server VM | 4 GB RAM, 2 vCPUs, 80 GB Storage |
-| Endpoint VM | 2 GB RAM, 1 vCPU, 20 GB Storage |
-
-**Network Configuration:**
-
-- Network Mode: Bridged Adapter
-- Wazuh Server IP Address: `192.168.0.104`
-- Communication Ports:
-  - `1514–1516` – Agent communication
-  - `55000` – Wazuh API
-  - `443` – Wazuh Dashboard
-
+Objectives
+Deploy a functional Wazuh SIEM server (Manager, Indexer, and Dashboard) in a virtualized lab environment.
+Deploy and register Wazuh agents on both a Linux (Kali) and a Windows endpoint.
+Validate agent connectivity and communication with the central Wazuh server.
+Simulate an SSH brute force attack to test real-time threat detection.
+Analyze the resulting alerts, rules, and dashboard visualizations to confirm detection and incident investigation capabilities.
+Technologies Used
+Component	Version
+Oracle VirtualBox	7.0
+Wazuh OVA	4.7.3
+Wazuh Manager	4.14.1
+Wazuh Indexer	4.14.1
+Wazuh Dashboard	4.14.1
+Wazuh Agent	4.7.3
+Endpoint OS	Kali Linux, Windows
+Architecture
+Virtualization Platform: Oracle VirtualBox 7.0
+Machine	Specification
+Host Machine	User host operating system
+Wazuh Server VM	4 GB RAM, 2 vCPUs, 80 GB Storage
+Endpoint VM	2 GB RAM, 1 vCPU, 20 GB Storage
+Network Configuration:
+Network Mode: Bridged Adapter
+Wazuh Server IP Address: `192.168.0.104`
+Communication Ports:
+`1514–1516` – Agent communication
+`55000` – Wazuh API
+`443` – Wazuh Dashboard
 The setup consists of a central Wazuh server (Manager, Indexer, Dashboard) communicating over a bridged network with two monitored endpoints — a Kali Linux VM and a Windows host — each running a Wazuh agent that forwards logs and events to the server for analysis and alerting.
-
-## Setup
-
-### 1. Wazuh Server Deployment
-- Deployed using the official Wazuh OVA image, imported into VirtualBox.
-- Allocated system resources and configured the network adapter in bridged mode.
-- Verified the server's IP address using `hostname -I` and `ip a`.
-- Confirmed the Wazuh Manager, Indexer, and Dashboard services were active via `systemctl` service checks.
-
-### 2. Dashboard Access and API Verification
-- Accessed the Wazuh dashboard securely over HTTPS using the server's IP address.
-- Verified backend communication by testing the Wazuh API locally with `curl` commands.
-
-### 3. Endpoint Agent Deployment
-- Installed the Wazuh agent on the Kali Linux VM via the APT package manager.
-- Installed the Wazuh agent on the Windows host using the Windows installer package.
-- Started and enabled the agent services for automatic launch on both endpoints.
-- Updated each agent's configuration file to point to the Wazuh manager's IP address for proper log and event forwarding.
-
-### 4. Agent Registration and Connectivity
-- Registered the Kali Linux agent with the Wazuh manager using the `agent-auth` utility.
-- Confirmed the agent appeared in the Wazuh dashboard's Agents section with an **active** status.
-- Verified the correct agent version, assigned ID, IP address, and regular keepalive messages, confirming stable communication between the Kali Linux endpoint and the central Wazuh server.
-
-## Attack Simulation
-
+Setup
+1. Wazuh Server Deployment
+Deployed using the official Wazuh OVA image, imported into VirtualBox.
+Allocated system resources and configured the network adapter in bridged mode.
+Verified the server's IP address using `hostname -I` and `ip a`.
+Confirmed the Wazuh Manager, Indexer, and Dashboard services were active via `systemctl` service checks.
+2. Dashboard Access and API Verification
+Accessed the Wazuh dashboard securely over HTTPS using the server's IP address.
+Verified backend communication by testing the Wazuh API locally with `curl` commands.
+3. Endpoint Agent Deployment
+Installed the Wazuh agent on the Kali Linux VM via the APT package manager.
+Installed the Wazuh agent on the Windows host using the Windows installer package.
+Started and enabled the agent services for automatic launch on both endpoints.
+Updated each agent's configuration file to point to the Wazuh manager's IP address for proper log and event forwarding.
+4. Agent Registration and Connectivity
+Registered the Kali Linux agent with the Wazuh manager using the `agent-auth` utility.
+Confirmed the agent appeared in the Wazuh dashboard's Agents section with an active status.
+Verified the correct agent version, assigned ID, IP address, and regular keepalive messages, confirming stable communication between the Kali Linux endpoint and the central Wazuh server.
+Attack Simulation
 An SSH brute force attack was simulated from the Kali Linux endpoint to demonstrate real-time threat detection. Multiple failed SSH login attempts were generated by manually entering the SSH command 4–5 times, targeting a non-existent user account on the local system.
-
-## Detection Process
-
-A threat hunting session was conducted between **08:38:32.190** and **08:59:28.410** on **January 20, 2026**, revealing a sequence of security events:
-
-- **Agent `kali`:** A pattern of authentication failures indicative of a brute-force attack, including multiple `sshd: Attempt to login using a non-existent user` events (**Rule ID 5710**) and a correlated `syslog: User missed the password more than one time` alert (**Rule ID 2502**).
-- **Agent `wazuh-server`:** A `Successful sudo to ROOT executed` event (**Rule ID 5402**) and associated PAM session activity (**Rule IDs 5501, 5502**).
-- **Agent `wazuh-server`:** Network configuration changes detected via `Listened ports status...changed` alerts (**Rule ID 533**).
-- **Agent `kali`:** The session concluded with a `Wazuh agent disconnected` event (**Rule ID 504**), which merits further investigation into the cause of the disconnection.
-
-### Alert Analysis
-
+Detection Process
+A threat hunting session was conducted between 08:38:32.190 and 08:59:28.410 on January 20, 2026, revealing a sequence of security events:
+Agent `kali`: A pattern of authentication failures indicative of a brute-force attack, including multiple `sshd: Attempt to login using a non-existent user` events (Rule ID 5710) and a correlated `syslog: User missed the password more than one time` alert (Rule ID 2502).
+Agent `wazuh-server`: A `Successful sudo to ROOT executed` event (Rule ID 5402) and associated PAM session activity (Rule IDs 5501, 5502).
+Agent `wazuh-server`: Network configuration changes detected via `Listened ports status...changed` alerts (Rule ID 533).
+Agent `kali`: The session concluded with a `Wazuh agent disconnected` event (Rule ID 504), which merits further investigation into the cause of the disconnection.
+Alert Analysis
 The alert timeline visualization provided a clear view of the attack pattern over time. Rule details explained the detection logic used by Wazuh to identify brute force behavior, and filtering events by agent allowed for focused analysis of the compromised endpoint — demonstrating effective incident investigation capabilities.
-
-## Screenshots
-
-> Replace the placeholders below with the corresponding images from the `media/` folder.
-
-| Description | Screenshot |
-|---|---|
-| Wazuh imported on VirtualBox | `![Wazuh imported on VirtualBox](media/image1.png)` |
-| Wazuh server login page | `![Wazuh server login page](media/image2.png)` |
-| Wazuh dashboard login page | `![Wazuh dashboard login page](media/image3.png)` |
-| Wazuh dashboard | `![Wazuh dashboard](media/image4.png)` |
-| Wazuh agent with active status | `![Wazuh agent active status](media/image5.jpeg)` |
-| SSH brute force activity visualization | `![SSH brute force activity visualization](media/image6.png)` |
-| SSH brute force attack detected in Wazuh Dashboard | `![SSH brute force attack detected](media/image7.png)` |
-
-## Results
-
-- Successfully deployed a working Wazuh SIEM POC environment with Manager, Indexer, and Dashboard services running without errors.
-- Successfully registered and validated connectivity for a Kali Linux agent (active status, stable keepalive messages).
-- Successfully simulated an SSH brute force attack and confirmed Wazuh detected, alerted, and visualized the malicious activity in real time.
-- Confirmed Wazuh's capability to correlate related events (authentication failures, sudo activity, port changes, agent disconnection) into a coherent incident timeline.
-
-## Lessons Learned
-
-- Centralized SIEM monitoring with Wazuh enables effective real-time detection of brute force attacks through correlated rule-based alerting.
-- Agent-based log collection provides visibility into both Linux and Windows endpoints from a single dashboard.
-- The `Wazuh agent disconnected` event (Rule ID 504) observed at the end of the session highlights the importance of investigating unexpected disconnections, as they could indicate evasion attempts or connectivity issues.
-- Validating both service health (`systemctl`) and API responsiveness (`curl`) is an important step before relying on a SIEM deployment for monitoring.
-
-## Future Improvements
-
-- Investigate and document the root cause of the `Wazuh agent disconnected` event (Rule ID 504) observed at the end of the threat hunting session.
-- Expand the use case demonstrations beyond SSH brute force to cover additional attack scenarios.
-- Extend endpoint coverage to additional Windows and Linux hosts to further test cross-platform monitoring at scale.
-
-## References
-
-- [Wazuh Proof of Concept Guide](https://documentation.wazuh.com/current/proof-of-concept-guide/index.html)
+Screenshots
+> Replace the placeholders below with the corresponding images from the `` folder.
+Description	Screenshot
+Wazuh imported on VirtualBox	`![Wazuh imported on VirtualBox](image1.png)`
+Wazuh server login page	`![Wazuh server login page](image2.png)`
+Wazuh dashboard login page	`![Wazuh dashboard login page](image3.png)`
+Wazuh dashboard	`![Wazuh dashboard](image4.png)`
+Wazuh agent with active status	`![Wazuh agent active status](image5.jpeg)`
+SSH brute force activity visualization	`![SSH brute force activity visualization](image6.png)`
+SSH brute force attack detected in Wazuh Dashboard	`![SSH brute force attack detected](image7.png)`
+Results
+Successfully deployed a working Wazuh SIEM POC environment with Manager, Indexer, and Dashboard services running without errors.
+Successfully registered and validated connectivity for a Kali Linux agent (active status, stable keepalive messages).
+Successfully simulated an SSH brute force attack and confirmed Wazuh detected, alerted, and visualized the malicious activity in real time.
+Confirmed Wazuh's capability to correlate related events (authentication failures, sudo activity, port changes, agent disconnection) into a coherent incident timeline.
+Lessons Learned
+Centralized SIEM monitoring with Wazuh enables effective real-time detection of brute force attacks through correlated rule-based alerting.
+Agent-based log collection provides visibility into both Linux and Windows endpoints from a single dashboard.
+The `Wazuh agent disconnected` event (Rule ID 504) observed at the end of the session highlights the importance of investigating unexpected disconnections, as they could indicate evasion attempts or connectivity issues.
+Validating both service health (`systemctl`) and API responsiveness (`curl`) is an important step before relying on a SIEM deployment for monitoring.
+Future Improvements
+Investigate and document the root cause of the `Wazuh agent disconnected` event (Rule ID 504) observed at the end of the threat hunting session.
+Expand the use case demonstrations beyond SSH brute force to cover additional attack scenarios.
+Extend endpoint coverage to additional Windows and Linux hosts to further test cross-platform monitoring at scale.
+References
+Wazuh Proof of Concept Guide
