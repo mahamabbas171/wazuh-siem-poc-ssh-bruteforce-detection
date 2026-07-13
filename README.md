@@ -91,17 +91,17 @@ The alert timeline visualization provided a clear view of the attack pattern ove
 
 ## Screenshots
 
-> Replace the placeholders below with the corresponding images from the `` folder.
+> Replace the placeholders below with the corresponding images (uploaded in the repo root, next to this README).
 
 | Description | Screenshot |
 |---|---|
-| Wazuh imported on VirtualBox | `![Wazuh imported on VirtualBox](image1.png)` |
-| Wazuh server login page | `![Wazuh server login page](image2.png)` |
-| Wazuh dashboard login page | `![Wazuh dashboard login page](image3.png)` |
-| Wazuh dashboard | `![Wazuh dashboard](image4.png)` |
-| Wazuh agent with active status | `![Wazuh agent active status](image5.jpeg)` |
-| SSH brute force activity visualization | `![SSH brute force activity visualization](image6.png)` |
-| SSH brute force attack detected in Wazuh Dashboard | `![SSH brute force attack detected](image7.png)` |
+| Wazuh imported on VirtualBox | ![Wazuh imported on VirtualBox](image1.png) |
+| Wazuh server login page | ![Wazuh server login page](image2.png) |
+| Wazuh dashboard login page | ![Wazuh dashboard login page](image3.png) |
+| Wazuh dashboard | ![Wazuh dashboard](image4.png) |
+| Wazuh agent with active status | ![Wazuh agent active status](image5.jpeg) |
+| SSH brute force activity visualization | ![SSH brute force activity visualization](image6.png) |
+| SSH brute force attack detected in Wazuh Dashboard | ![SSH brute force attack detected](image7.png) |
 
 ## Results
 
